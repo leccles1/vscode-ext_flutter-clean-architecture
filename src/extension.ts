@@ -58,7 +58,7 @@ export async function Go (uri: Uri, useCubit: boolean) {
   }
 
   const useEquatable = true;
-
+  const gitEnabled = true;
   const pascalCaseFeatureName = pascalCase(
     featureName.toLowerCase()
   );
@@ -67,7 +67,8 @@ export async function Go (uri: Uri, useCubit: boolean) {
       `${featureName}`,
       targetDirectory,
       useEquatable,
-      useCubit
+      useCubit,
+      gitEnabled
     );
     window.showInformationMessage(
       `Successfully Generated ${pascalCaseFeatureName} Feature`
@@ -184,7 +185,8 @@ export async function generateFeatureArchitecture (
   featureName: string,
   targetDirectory: string,
   useEquatable: boolean,
-  useCubit: boolean
+  useCubit: boolean,
+  gitEnabled: boolean
 ) {
   // Create the features directory if its does not exist yet
   const featuresDirectoryPath = getFeaturesDirectoryPath(targetDirectory);
@@ -202,7 +204,7 @@ export async function generateFeatureArchitecture (
     "datasources",
     "models",
     "repositories",
-  ]);
+  ], gitEnabled);
 
   // Create the domain layer
   const domainDirectoryPath = path.join(featureDirectoryPath, "domain");
@@ -210,7 +212,7 @@ export async function generateFeatureArchitecture (
     "entities",
     "repositories",
     "usecases",
-  ]);
+  ], gitEnabled);
 
   // Create the presentation layer
   const presentationDirectoryPath = path.join(
@@ -221,7 +223,7 @@ export async function generateFeatureArchitecture (
     useCubit ? "cubit" : "bloc",
     "pages",
     "widgets",
-  ]);
+  ], gitEnabled);
 
   // Generate the bloc code in the presentation layer
  useCubit
@@ -232,8 +234,6 @@ export async function generateFeatureArchitecture (
 export function getFeaturesDirectoryPath (currentDirectory: string): string {
   // Split the path
   const splitPath = currentDirectory.split(path.sep);
-  console.log(splitPath);
-  console.log(`separator == ${path.sep}`);
   // Remove trailing \
   if (splitPath[splitPath.length - 1] === "") {
     splitPath.pop();
@@ -252,23 +252,27 @@ export function getFeaturesDirectoryPath (currentDirectory: string): string {
 
 export async function createDirectories (
   targetDirectory: string,
-  childDirectories: string[]
+  childDirectories: string[],
+  gitEnabled: boolean,
 ): Promise<void> {
   // Create the parent directory
   await createDirectory(targetDirectory);
   // Creat the children
   childDirectories.map(
     async (directory) =>
-      await createDirectory(path.join(targetDirectory, directory))
+      await createDirectory(path.join(targetDirectory, directory), gitEnabled)
   );
 }
 
-async function createDirectory (targetDirectory: string): Promise<void> {
+async function createDirectory (targetDirectory: string, gitEnabled: boolean = false): Promise<void> {
   try {
     await mkdirp(targetDirectory);
     // if a .git tracked repo - add .gitkeep
     // const workspaceRoot = await getWorkspaceRoot();
-    await promises.writeFile(`${targetDirectory}/.gitkeep`, new Uint8Array(), {});
+    if(gitEnabled) {
+      await promises.writeFile(`${targetDirectory}/.gitkeep`, new Uint8Array(), {});
+    }
+    
     
     return;
   } catch (error) {
