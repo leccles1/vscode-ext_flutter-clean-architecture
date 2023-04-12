@@ -1,8 +1,11 @@
-import * as _ from "lodash";
-import * as changeCase from "change-case";
-import * as mkdirp from "mkdirp";
+import {isNil, get, isEmpty, split} from "lodash";
+import {pascalCase} from 'pascal-case';
+import { snakeCase } from "snake-case";
+import { mkdirp } from "mkdirp";
 import * as path from "path";
-
+import {
+  promises
+} from 'fs';
 import {
   commands,
   ExtensionContext,
@@ -11,6 +14,7 @@ import {
   QuickPickOptions,
   Uri,
   window,
+  workspace,
 } from "vscode";
 import { existsSync, lstatSync, writeFile, appendFile } from "fs";
 import {
@@ -49,12 +53,13 @@ export async function Go (uri: Uri, useCubit: boolean) {
   try {
     targetDirectory = await getTargetDirectory(uri);
   } catch (error) {
-    window.showErrorMessage(error.message);
+    
+    window.showErrorMessage(`Error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
   }
 
   const useEquatable = true;
 
-  const pascalCaseFeatureName = changeCase.pascalCase(
+  const pascalCaseFeatureName = pascalCase(
     featureName.toLowerCase()
   );
   try {
@@ -81,7 +86,7 @@ export function isNameValid (featureName: string | undefined): boolean {
     return false;
   }
   // Check if feature name is null or white space
-  if (_.isNil(featureName) || featureName.trim() === "") {
+  if (isNil(featureName) || featureName.trim() === "") {
     return false;
   }
 
@@ -91,9 +96,9 @@ export function isNameValid (featureName: string | undefined): boolean {
 
 export async function getTargetDirectory (uri: Uri): Promise<string> {
   let targetDirectory;
-  if (_.isNil(_.get(uri, "fsPath")) || !lstatSync(uri.fsPath).isDirectory()) {
+  if (isNil(get(uri, "fsPath")) || !lstatSync(uri.fsPath).isDirectory()) {
     targetDirectory = await promptForTargetDirectory();
-    if (_.isNil(targetDirectory)) {
+    if (isNil(targetDirectory)) {
       throw Error("Please select a valid directory");
     }
   } else {
@@ -111,8 +116,8 @@ export async function promptForTargetDirectory (): Promise<string | undefined> {
   };
 
   return window.showOpenDialog(options).then((uri) => {
-    if (_.isNil(uri) || _.isEmpty(uri)) {
-      return undefined;
+    if (isNil(uri) || isEmpty(uri)) {
+    return undefined;
     }
     return uri[0].fsPath;
   });
@@ -219,7 +224,7 @@ export async function generateFeatureArchitecture (
   ]);
 
   // Generate the bloc code in the presentation layer
-  useCubit
+ useCubit
     ? await generateCubitCode(featureName, presentationDirectoryPath, useEquatable)
     : await generateBlocCode(featureName, presentationDirectoryPath, useEquatable);
 }
@@ -227,7 +232,8 @@ export async function generateFeatureArchitecture (
 export function getFeaturesDirectoryPath (currentDirectory: string): string {
   // Split the path
   const splitPath = currentDirectory.split(path.sep);
-
+  console.log(splitPath);
+  console.log(`separator == ${path.sep}`);
   // Remove trailing \
   if (splitPath[splitPath.length - 1] === "") {
     splitPath.pop();
@@ -257,15 +263,17 @@ export async function createDirectories (
   );
 }
 
-function createDirectory (targetDirectory: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    mkdirp(targetDirectory, (error) => {
-      if (error) {
-        return reject(error);
-      }
-      resolve();
-    });
-  });
+async function createDirectory (targetDirectory: string): Promise<void> {
+  try {
+    await mkdirp(targetDirectory);
+    // if a .git tracked repo - add .gitkeep
+    // const workspaceRoot = await getWorkspaceRoot();
+    await promises.writeFile(`${targetDirectory}/.gitkeep`, new Uint8Array(), {});
+    
+    return;
+  } catch (error) {
+    throw error;
+  }
 }
 
 function createBlocEventTemplate (
@@ -273,7 +281,7 @@ function createBlocEventTemplate (
   targetDirectory: string,
   useEquatable: boolean
 ) {
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   const targetPath = `${targetDirectory}/bloc/${snakeCaseBlocName}_event.dart`;
   if (existsSync(targetPath)) {
     throw Error(`${snakeCaseBlocName}_event.dart already exists`);
@@ -299,7 +307,7 @@ function createBlocStateTemplate (
   targetDirectory: string,
   useEquatable: boolean
 ) {
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   const targetPath = `${targetDirectory}/bloc/${snakeCaseBlocName}_state.dart`;
   if (existsSync(targetPath)) {
     throw Error(`${snakeCaseBlocName}_state.dart already exists`);
@@ -325,7 +333,7 @@ function createBlocTemplate (
   targetDirectory: string,
   useEquatable: boolean
 ) {
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   const targetPath = `${targetDirectory}/bloc/${snakeCaseBlocName}_bloc.dart`;
   if (existsSync(targetPath)) {
     throw Error(`${snakeCaseBlocName}_bloc.dart already exists`);
@@ -351,7 +359,7 @@ function createCubitStateTemplate (
   targetDirectory: string,
   useEquatable: boolean
 ) {
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   const targetPath = `${targetDirectory}/cubit/${snakeCaseBlocName}_state.dart`;
   if (existsSync(targetPath)) {
     throw Error(`${snakeCaseBlocName}_state.dart already exists`);
@@ -377,7 +385,7 @@ function createCubitTemplate (
   targetDirectory: string,
   useEquatable: boolean
 ) {
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   const targetPath = `${targetDirectory}/cubit/${snakeCaseBlocName}_cubit.dart`;
   if (existsSync(targetPath)) {
     throw Error(`${snakeCaseBlocName}_cubit.dart already exists`);

@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import {get, isNil, has} from "lodash";
 
 import * as semver from "semver";
 import { window, env, Uri } from "vscode";
@@ -91,8 +91,8 @@ export async function analyzeDependencies() {
   ];
 
   const pubspec = await getPubspec();
-  const dependencies = _.get(pubspec, "dependencies", {});
-  const devDependencies = _.get(pubspec, "dev_dependencies", {});
+  const dependencies = get(pubspec, "dependencies", []);
+  const devDependencies = get(pubspec, "dev_dependencies", []);
 
   checkForUpgrades(dependenciesToAnalyze, dependencies);
   checkForUpgrades(devDependenciesToAnalyze, devDependencies);
@@ -104,13 +104,13 @@ function checkForUpgrades(
 ) {
   for (let i = 0; i < dependenciesToAnalyze.length; i++) {
     const dependency = dependenciesToAnalyze[i];
-    if (_.has(dependencies, dependency.name)) {
-      const dependencyVersion = _.get(dependencies, dependency.name, "latest");
+    if (has(dependencies, dependency.name)) {
+      const dependencyVersion = get(dependencies, dependency.name, "latest");
       if (dependencyVersion === "latest") continue;
       if (dependencyVersion === "any") continue;
       if (dependencyVersion == null) continue;
       if (typeof dependencyVersion !== "string") continue;
-      const minVersion = _.get(
+      const minVersion = get(
         semver.minVersion(dependencyVersion),
         "version",
         "0.0.0"
@@ -132,7 +132,7 @@ function checkForUpgrades(
             const action = dependency.actions.find(
               (action) => action.name === invokedAction
             );
-            if (!_.isNil(action)) {
+            if (!isNil(action)) {
               action.callback();
             }
           });

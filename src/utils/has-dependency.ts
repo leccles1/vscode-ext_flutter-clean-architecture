@@ -1,9 +1,9 @@
-import * as _ from "lodash";
+import {has, get}  from "lodash";
 
 import { getPubspec } from ".";
 
 export async function hasDependency (dependency: string) {
   const pubspec = await getPubspec();
-  const dependencies = _.get(pubspec, "dependencies", {});
-  return _.has(dependencies, dependency);
+  const dependencies = get(pubspec, "dependencies", {});
+  return has(dependencies, dependency);
 }

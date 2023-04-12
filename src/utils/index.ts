@@ -3,3 +3,4 @@ export * from "./get-pubspec";
 export * from "./get-pubspec-path";
 export * from "./has-dependency";
 export * from "./update-pubspec-dependency";
+export * from "./get-workspaceRoot";

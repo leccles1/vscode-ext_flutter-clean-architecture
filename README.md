@@ -1,5 +1,10 @@
 # Flutter Clean Architecture feature scaffolding
 
+> ### This is a fork of the original VSC extension from [KiritchoukC](https://github.com/KiritchoukC/vscode-ext_flutter-clean-architecture)
+
+* Git support (.gitkeep)
+* Include tests (Replicates feature)
+
 > ### This extension is based on [felangel](https://github.com/felangel) BLoC extension
 
 ## Introduction

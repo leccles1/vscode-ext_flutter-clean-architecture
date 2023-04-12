@@ -1,4 +1,5 @@
-import * as changeCase from "change-case";
+import { pascalCase } from "pascal-case";
+import { snakeCase } from "snake-case";
 
 export function getCubitTemplate (cubitName: string, useEquatable: boolean): string {
   return useEquatable
@@ -7,8 +8,8 @@ export function getCubitTemplate (cubitName: string, useEquatable: boolean): str
 }
 
 function getEquatableCubitTemplate (cubitName: string) {
-  const pascalCaseCubitName = changeCase.pascalCase(cubitName.toLowerCase());
-  const snakeCaseCubitName = changeCase.snakeCase(cubitName.toLowerCase());
+  const pascalCaseCubitName = pascalCase(cubitName.toLowerCase());
+  const snakeCaseCubitName = snakeCase(cubitName.toLowerCase());
   const cubitState = `${pascalCaseCubitName}State`;
   return `import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -22,8 +23,8 @@ class ${pascalCaseCubitName}Cubit extends Cubit<${cubitState}> {
 }
 
 function getDefaultCubitTemplate (cubitName: string) {
-  const pascalCaseCubitName = changeCase.pascalCase(cubitName.toLowerCase());
-  const snakeCaseCubitName = changeCase.snakeCase(cubitName.toLowerCase());
+  const pascalCaseCubitName = pascalCase(cubitName.toLowerCase());
+  const snakeCaseCubitName = snakeCase(cubitName.toLowerCase());
   const cubitState = `${pascalCaseCubitName}State`;
   return `import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';

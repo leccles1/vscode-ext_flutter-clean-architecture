@@ -1,4 +1,5 @@
-import * as changeCase from "change-case";
+import { pascalCase } from "pascal-case";
+import { snakeCase } from "snake-case";
 
 export function getBlocTemplate (blocName: string, useEquatable: boolean): string {
   return useEquatable
@@ -7,8 +8,8 @@ export function getBlocTemplate (blocName: string, useEquatable: boolean): strin
 }
 
 function getEquatableBlocTemplate (blocName: string) {
-  const pascalCaseBlocName = changeCase.pascalCase(blocName.toLowerCase());
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const pascalCaseBlocName = pascalCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   const blocState = `${pascalCaseBlocName}State`;
   const blocEvent = `${pascalCaseBlocName}Event`;
   return `import 'package:bloc/bloc.dart';
@@ -28,8 +29,8 @@ class ${pascalCaseBlocName}Bloc extends Bloc<${blocEvent}, ${blocState}> {
 }
 
 function getDefaultBlocTemplate (blocName: string) {
-  const pascalCaseBlocName = changeCase.pascalCase(blocName.toLowerCase());
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const pascalCaseBlocName = pascalCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   const blocState = `${pascalCaseBlocName}State`;
   const blocEvent = `${pascalCaseBlocName}Event`;
   return `import 'package:bloc/bloc.dart';

@@ -1,4 +1,5 @@
-import * as changeCase from "change-case";
+import { snakeCase } from "snake-case";
+import { pascalCase } from "pascal-case";
 
 export function getCubitStateTemplate (
   cubitName: string,
@@ -10,8 +11,8 @@ export function getCubitStateTemplate (
 }
 
 function getEquatableCubitStateTemplate (cubitName: string): string {
-  const pascalCaseCubitName = changeCase.pascalCase(cubitName.toLowerCase());
-  const snakeCaseCubitName = changeCase.snakeCase(cubitName.toLowerCase());
+  const pascalCaseCubitName = pascalCase(cubitName.toLowerCase());
+  const snakeCaseCubitName = snakeCase(cubitName.toLowerCase());
   return `part of '${snakeCaseCubitName}_cubit.dart';
 
 abstract class ${pascalCaseCubitName}State extends Equatable {
@@ -26,8 +27,8 @@ class ${pascalCaseCubitName}Initial extends ${pascalCaseCubitName}State {}
 }
 
 function getDefaultCubitStateTemplate (cubitName: string): string {
-  const pascalCaseCubitName = changeCase.pascalCase(cubitName.toLowerCase());
-  const snakeCaseCubitName = changeCase.snakeCase(cubitName.toLowerCase());
+  const pascalCaseCubitName = pascalCase(cubitName.toLowerCase());
+  const snakeCaseCubitName = snakeCase(cubitName.toLowerCase());
   return `part of '${snakeCaseCubitName}_cubit.dart';
 
 @immutable

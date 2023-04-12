@@ -1,4 +1,5 @@
-import * as changeCase from "change-case";
+import { pascalCase } from "pascal-case";
+import { snakeCase } from "snake-case";
 
 export function getBlocStateTemplate (
   blocName: string,
@@ -10,8 +11,8 @@ export function getBlocStateTemplate (
 }
 
 function getEquatableBlocStateTemplate (blocName: string): string {
-  const pascalCaseBlocName = changeCase.pascalCase(blocName.toLowerCase());
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const pascalCaseBlocName = pascalCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   return `part of '${snakeCaseBlocName}_bloc.dart';
 
 abstract class ${pascalCaseBlocName}State extends Equatable {
@@ -25,8 +26,8 @@ class ${pascalCaseBlocName}Initial extends ${pascalCaseBlocName}State {}
 }
 
 function getDefaultBlocStateTemplate (blocName: string): string {
-  const pascalCaseBlocName = changeCase.pascalCase(blocName.toLowerCase());
-  const snakeCaseBlocName = changeCase.snakeCase(blocName.toLowerCase());
+  const pascalCaseBlocName = pascalCase(blocName.toLowerCase());
+  const snakeCaseBlocName = snakeCase(blocName.toLowerCase());
   return `part of '${snakeCaseBlocName}_bloc.dart';
 @immutable
 abstract class ${pascalCaseBlocName}State {}
